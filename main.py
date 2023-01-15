@@ -3,6 +3,8 @@ import pandas
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from datetime import datetime
+import collections
+import argparse
 
 
 def get_wineyard_year():
@@ -27,24 +29,51 @@ def year_declension(year):
     return year_word
 
 
-env = Environment(
-    loader=FileSystemLoader('.'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
+def main():
+    parser = argparse.ArgumentParser(description='This program running '
+                                                 'site with wineyard and '
+                                                 'load data from excel file '
+                                                 'for template.')
+    parser.add_argument('excel_db',
+                        help='Name of excel_db file',
+                        type=str,
+                        default='wine.xlsx')
+    args = parser.parse_args()
 
-template = env.get_template('template.html')
+    env = Environment(
+        loader=FileSystemLoader('.'),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
+    template = env.get_template('template.html')
 
-wines_excel = pandas.read_excel('wine.xlsx', sheet_name='Лист1')
-wines = wines_excel.to_dict(orient='records')
+    drinks_excel = pandas.read_excel(args.excel_db,
+                                     na_values=None,
+                                     keep_default_na=False)
 
-wineyard_year = get_wineyard_year()
-rendered_page = template.render(
-    wineyard_year=f'{wineyard_year} {year_declension(wineyard_year)}',
-    wines=wines
-)
+    drinks = drinks_excel.to_dict(orient='records')
+    drinks_by_category = collections.defaultdict(list)
+    for drink in drinks:
+        buffer = {
+                'Картинка': drink['Картинка'],
+                'Название': drink['Название'],
+                'Сорт': drink['Сорт'],
+                'Цена': drink['Цена'],
+                'Акция': drink['Акция'],
+        }
+        drinks_by_category[drink['Категория']].append(buffer)
 
-with open('index.html', 'w', encoding='utf-8') as file:
-    file.write(rendered_page)
+    wineyard_year = get_wineyard_year()
+    rendered_page = template.render(
+        wineyard_year=f'{wineyard_year} {year_declension(wineyard_year)}',
+        drinks=drinks_by_category
+    )
 
-server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
-server.serve_forever()
+    with open('index.html', 'w', encoding='utf-8') as file:
+        file.write(rendered_page)
+
+    server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
+    server.serve_forever()
+
+
+if __name__ == "__main__":
+    main()
