@@ -1,4 +1,5 @@
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+import pandas
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from datetime import datetime
@@ -33,16 +34,17 @@ env = Environment(
 
 template = env.get_template('template.html')
 
+wines_excel = pandas.read_excel('wine.xlsx', sheet_name='Лист1')
+wines = wines_excel.to_dict(orient='records')
+
 wineyard_year = get_wineyard_year()
 rendered_page = template.render(
-    wineyard_year=f'{wineyard_year} {year_declension(wineyard_year)}'
+    wineyard_year=f'{wineyard_year} {year_declension(wineyard_year)}',
+    wines=wines
 )
-
 
 with open('index.html', 'w', encoding='utf-8') as file:
     file.write(rendered_page)
 
-
 server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
-print(1)
 server.serve_forever()
