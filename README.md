@@ -4,6 +4,7 @@
 
 ## Запуск
 
+<<<<<<< HEAD
 1. Установить нужные зависимости:
 ```shell
 $ pip install -r requirements.txt
