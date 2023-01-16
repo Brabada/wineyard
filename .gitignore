@@ -1,6 +1,7 @@
 env/
 .vscode/
 *.xlsx
+*.xlsx*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
