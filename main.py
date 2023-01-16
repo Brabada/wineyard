@@ -8,10 +8,11 @@ import argparse
 
 
 def get_wineyard_year():
-    return datetime.now().year - datetime(year=1920, month=1, day=1).year
+    WINEYARD_FOUNDING_YEAR = 1920
+    return datetime.now().year - WINEYARD_FOUNDING_YEAR
 
 
-def year_declension(year):
+def get_year_declension(year):
     """Returns declension of word 'years' by year number"""
 
     if 5 < year < 21:
@@ -64,7 +65,7 @@ def main():
 
     wineyard_year = get_wineyard_year()
     rendered_page = template.render(
-        wineyard_year=f'{wineyard_year} {year_declension(wineyard_year)}',
+        wineyard_year=f'{wineyard_year} {get_year_declension(wineyard_year)}',
         drinks=drinks_by_category
     )
 
