@@ -8,8 +8,8 @@ import argparse
 
 
 def get_wineyard_year():
-    WINEYARD_FOUNDING_YEAR = 1920
-    return datetime.now().year - WINEYARD_FOUNDING_YEAR
+    wineyard_founded_year = 1920
+    return datetime.now().year - wineyard_founded_year
 
 
 def get_year_declension(year):
